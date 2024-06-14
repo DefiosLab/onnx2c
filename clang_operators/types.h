@@ -1,6 +1,6 @@
 #ifndef TYPES_H
 #define TYPES_H
-#include<stdint.h>
+#include <stdint.h>
 typedef struct {
   int32_t ndim;
   int32_t shape[10];
