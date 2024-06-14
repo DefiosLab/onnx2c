@@ -171,8 +171,8 @@ void Conv_F32(float_tensor *input, float_tensor *weight, float_tensor *bias, flo
   
   for(int och = 0;och<out_ch;och++){
     for(int ich = 0;ich<in_ch;ich++){
-      for(int i= 0;i<out_h;i+=attrs->stride[0]){
-	for(int j= 0 ;j<out_w;j+=attrs->stride[1]){	  
+      for(int i= 0;i<out_h;i++){
+	for(int j= 0 ;j<out_w;j++){	  
 	  int32_t out_idx = och * out_h * out_w + i * out_w + j;
 	  for(int ki=0;ki<ker_h;ki++){
 	    for(int kj=0;kj<ker_w;kj++){
