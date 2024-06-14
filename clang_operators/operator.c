@@ -67,47 +67,47 @@ void MaxPool_F32(float_tensor *input, float_tensor *output, pool_attrs *attrs){
   }
 }
 
-/* void BatchNormalization_F32(float_tensor *X, float_tensor *scale, float_tensor *B, float_tensor *mean, float_tensor *var, bn_attrs *attrs, float_tensor *Y){ */
-/*   ASSERT(X->ndim == 4, "BatchNormalization supports only 4 dimensions"); */
-/*   float epsilon = attrs->epsilon; */
-/*   float momentum = attrs->momentum; */
-/*   int32_t in_ch = X->shape[1]; */
-/*   int32_t in_h = X->shape[2]; */
-/*   int32_t in_w = X->shape[3]; */
+void BatchNormalization_F32(float_tensor *X, float_tensor *scale, float_tensor *B, float_tensor *mean, float_tensor *var, bn_attrs *attrs, float_tensor *Y){
+  ASSERT(X->ndim == 4, "BatchNormalization supports only 4 dimensions");
+  float epsilon = attrs->epsilon;
+  float momentum = attrs->momentum;
+  int32_t in_ch = X->shape[1];
+  int32_t in_h = X->shape[2];
+  int32_t in_w = X->shape[3];
   
-/*   for(int c = 0;c < in_ch;c++){ */
+  for(int c = 0;c < in_ch;c++){
 
-/*     //calculate mean */
-/*     float sum = 0; */
-/*     for(int i = 0;i<in_h;i++){ */
-/*       for(int j=0;j<in_w;j++){ */
-/* 	int32_t idx = c * in_h * in_w + i*in_w+j; */
-/* 	sum+=X->data[idx]; */
-/*       } */
-/*     } */
-/*     float saved_mean = sum / (in_h*in_w); */
+    //calculate mean
+    float sum = 0;
+    for(int i = 0;i<in_h;i++){
+      for(int j=0;j<in_w;j++){
+	int32_t idx = c * in_h * in_w + i*in_w+j;
+	sum+=X->data[idx];
+      }
+    }
+    float saved_mean = sum / (in_h*in_w);
 
-/*     //calculate var */
-/*     sum = 0; */
-/*     for(int i = 0;i<in_h;i++){ */
-/*       for(int j=0;j<in_w;j++){ */
-/* 	int32_t idx = c * in_h * in_w + i*in_w+j; */
-/* 	sum+=(X->data[idx] - saved_mean) * (X->data[idx] - saved_mean); */
-/*       } */
-/*     } */
-/*     float saved_var = sum / (in_h * in_w); */
+    //calculate var
+    sum = 0;
+    for(int i = 0;i<in_h;i++){
+      for(int j=0;j<in_w;j++){
+	int32_t idx = c * in_h * in_w + i*in_w+j;
+	sum+=(X->data[idx] - saved_mean) * (X->data[idx] - saved_mean);
+      }
+    }
+    float saved_var = sum / (in_h * in_w);
     
     
-/*     float output_mean = mean->data[c] * momentum + saved_mean * (1 - momentum); */
-/*     float output_var = var->data[c] * momentum + saved_var * (1 - momentum); */
-/*     for(int i = 0;i<in_h;i++){ */
-/*       for(int j=0;j<in_w;j++){ */
-/* 	int32_t idx = c * in_h * in_w + i*in_w+j; */
-/* 	Y->data[idx] = scale->data[c] * (X->data[idx] - output_mean) / sqrt(output_var + epsilon) + B->data[c]; */
-/*       } */
-/*     } */
-/*   } */
-/* } */
+    float output_mean = mean->data[c] * momentum + saved_mean * (1 - momentum);
+    float output_var = var->data[c] * momentum + saved_var * (1 - momentum);
+    for(int i = 0;i<in_h;i++){
+      for(int j=0;j<in_w;j++){
+	int32_t idx = c * in_h * in_w + i*in_w+j;
+	Y->data[idx] = scale->data[c] * (X->data[idx] - output_mean) / sqrt(output_var + epsilon) + B->data[c];
+      }
+    }
+  }
+}
   
 void Gemm_F32(float_tensor *A, float_tensor *B, float_tensor *C, float_tensor *output,gemm_attrs *attrs, bool use_C){
   int32_t p = A->shape[0];

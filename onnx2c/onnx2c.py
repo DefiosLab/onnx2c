@@ -33,6 +33,7 @@ def arg_parser():
     parser = argparse.ArgumentParser()
 
     parser.add_argument("--onnx", type=str, required=True, help="input onnx path")
+    parser.add_argument("--noopt", action='store_false',help="disable model optimize")
     parser.add_argument(
         "--input_data",
         type=str,
@@ -71,7 +72,8 @@ def main():
     if model.opset_import[0].version != 13:
         print("Convert onnx to opset=13")
         model = version_convert(model)
-    model, check = simplify(model)
+    if args.noopt==True:
+        model, check = simplify(model)
     onnx.save(model,"legalized.onnx")
     # Generate C
     gen = onnx2c.Generator(model)

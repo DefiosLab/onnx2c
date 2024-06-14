@@ -9,17 +9,12 @@ import os
 import ctypes
 
 print("Loading model...", end="")
-model_path = "mnist.onnx"
+model_path = "bn.onnx"
 model = onnx.load(model_path)
 print("Done")
 
-
-image = cv2.imread("input.png")
-gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-gray = cv2.resize(gray, (28, 28)).astype(np.float32) / 255
-img = np.reshape(gray, (1, 1, 28, 28))
-img = np.random.rand((1,3,224,224))
-
+img = np.random.rand(1,3,224,224).astype(np.float32)
+out = np.zeros((1,64,112,112)).astype(np.float32)
 
 # onnxruntime
 ort_sess = onnxruntime.InferenceSession(model_path)
@@ -39,7 +34,7 @@ c_func = lib.run
 c_func.argtypes = [ctypes.POINTER(ctypes.c_float), ctypes.POINTER(ctypes.c_float)]
 
 input_c = img.ctypes.data_as(ctypes.POINTER(ctypes.c_float))
-out = np.zeros((1, 10)).astype(np.float32)
+
 output_c = out.ctypes.data_as(ctypes.POINTER(ctypes.c_float))
 result_vfv = out
 
