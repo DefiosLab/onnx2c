@@ -4,6 +4,7 @@ import onnx2c
 import onnx
 from onnxsim import simplify
 from onnx import version_converter
+from onnx import shape_inference
 
 
 def arg_parser():
@@ -30,10 +31,21 @@ def version_convert(model):
     return model
 
 
+def set_undefined_dims(model):
+    graph = model.graph
+    for input_tensor in graph.input:
+        tensor_shape = input_tensor.type.tensor_type.shape
+        for dim in tensor_shape.dim:
+            if not (dim.dim_value):
+                dim.dim_value = 1
+    return model
+
+
 def main():
     args = arg_parser()
     model = onnx.load(args.onnx)
-    # Legalize
+    model = set_undefined_dims(model)
+    model = shape_inference.infer_shapes(model)
     model, check = simplify(model)
     if model.opset_import[0].version != 13:
         print("Convert onnx to opset=13")
