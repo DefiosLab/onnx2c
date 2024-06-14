@@ -9,5 +9,12 @@ setup(
             "onnx2c=onnx2c.onnx2c:main",
         ],
     },
-    install_requires=["numpy", "onnxruntime", "scipy", "onnx", "onnx-simplifier"],
+    install_requires=[
+        "numpy",
+        "onnxruntime",
+        "scipy",
+        "onnx",
+        "onnx-simplifier",
+        "onnxconverter-common",
+    ],
 )

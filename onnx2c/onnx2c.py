@@ -3,6 +3,7 @@ import argparse
 import onnx2c
 import onnx
 from onnxsim import simplify
+from onnx import version_converter
 
 
 def arg_parser():
@@ -19,12 +20,24 @@ def arg_parser():
     return args
 
 
+def version_convert(model):
+    target_opset_version = 13
+    try:
+        model = version_converter.convert_version(model, target_opset_version)
+        print("Model conversion successful.")
+    except Exception as e:
+        print(f"Error converting model: {e}")
+    return model
+
+
 def main():
     args = arg_parser()
     model = onnx.load(args.onnx)
     # Legalize
-    model.opset_import[0].version = 13
     model, check = simplify(model)
+    if model.opset_import[0].version == 13:
+        print("Convert onnx to opset=13")
+        model = version_convert(model)
     # Generate C
     gen = onnx2c.Generator(model)
 
