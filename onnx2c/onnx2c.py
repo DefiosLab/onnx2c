@@ -35,7 +35,7 @@ def main():
     model = onnx.load(args.onnx)
     # Legalize
     model, check = simplify(model)
-    if model.opset_import[0].version == 13:
+    if model.opset_import[0].version != 13:
         print("Convert onnx to opset=13")
         model = version_convert(model)
     # Generate C
