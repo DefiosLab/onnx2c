@@ -6,8 +6,8 @@
 ## C言語生成&実行
 - 共有ライブラリとしてコンパイルしてpythonから実行します。
 ```
-$ onnx2c --onnx mnist.onnx
-$ make
+$ onnx2c --onnx mnist.onnx #artifactsが生成される
+$ make 
 $ python3 run.py
 ```
 
