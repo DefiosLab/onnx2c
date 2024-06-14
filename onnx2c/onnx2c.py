@@ -8,6 +8,27 @@ from onnx import shape_inference
 import onnxruntime as ort
 from onnxoptimizer import optimize
 
+def name_legalize(model):
+    def gen_name(name):
+        return "_"+name.replace('/','_')
+    
+    for node in model.graph.node:
+        node.name = gen_name(node.name)
+        for i in range(len(node.input)):
+            print(node.input[i])
+            node.input[i] = gen_name(node.input[i])
+        for i in range(len(node.output)):
+            node.output[i] = gen_name(node.output[i])
+
+    for input in model.graph.input:
+        input.name = gen_name(input.name)
+    for output in model.graph.output:
+        output.name = gen_name(output.name)
+    for init in model.graph.initializer:
+        init.name = gen_name(init.name)
+    onnx.save(model,"legalized.onnx")    
+    return model
+
 def arg_parser():
     parser = argparse.ArgumentParser()
 
@@ -44,6 +65,7 @@ def set_undefined_dims(model):
 def main():
     args = arg_parser()
     model = onnx.load(args.onnx)
+    model = name_legalize(model)
     model = set_undefined_dims(model)
     model = shape_inference.infer_shapes(model)
     if model.opset_import[0].version != 13:
