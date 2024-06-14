@@ -19,6 +19,17 @@ class Gemm(Layer):
         else:
             use_C = "false"
             c_name = "NULL"
+
+        if "alpha" in self.attrs:
+            alpha = self.attrs["alpha"]
+        else:
+            alpha = 1.0
+
+        if "beta" in self.attrs:
+            beta = self.attrs["beta"]
+        else:
+            beta = 1.0
+
         if "transA" in self.attrs:
             transA = "true" if self.attrs["transA"] else "false"
         else:
@@ -32,7 +43,7 @@ class Gemm(Layer):
 
         attr_name = self.node.name + "_attr"
         attrs_code = f"""
-gemm_attrs {attr_name} = {{  {transA},{transB} }};
+gemm_attrs {attr_name} = {{  {alpha},{beta},{transA},{transB} }};
 """
         self.gen.write_header(attrs_code)
 

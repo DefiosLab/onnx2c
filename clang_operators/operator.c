@@ -27,6 +27,42 @@ void Relu_F32(float_tensor *input, float_tensor *output){
     }
   }
 }
+void GlobalAveragePool_F32(float_tensor *input, float_tensor *output){
+  ASSERT(input->ndim ==4, "MaxPool_F32 supports only 4 dimensions");
+
+  int32_t in_ch = input->shape[1];
+  int32_t in_h = input->shape[2];
+  int32_t in_w = input->shape[3];
+  
+  for(int ich = 0;ich<in_ch;ich++){
+    float sum=0;
+    for(int i= 0;i<in_h;i++){
+      for(int j= 0 ;j<in_w;j++){
+	int32_t idx=ich * in_h * in_w + i * in_w + j;
+	sum += input->data[idx];
+      }
+    }
+    output->data[ich]=sum / (in_h * in_w);
+  }
+}
+
+
+void Add_F32(float_tensor *A, float_tensor *B, float_tensor *C){
+  ASSERT(A->ndim ==B->ndim, "The dimensions of A and B must match.");
+  ASSERT(A->ndim == 4, "Add supports only 4 dimensions");
+  int32_t batch = A->shape[0];
+  int32_t channels = A->shape[1];
+  int32_t height = A->shape[2];
+  int32_t width = A->shape[3];
+  int32_t img_size = height * width;
+  for(int c=0;c<channels;c++){
+    for(int i=0;i<height;i++){
+      for(int j=0;j<width;j++){
+	C->data[c*img_size + i*width+j] = A->data[c*img_size + i*width+j] + B->data[c*img_size + i*width+j];
+      }
+    }
+  }
+}
 
 
 
@@ -77,29 +113,31 @@ void BatchNormalization_F32(float_tensor *X, float_tensor *scale, float_tensor *
   
   for(int c = 0;c < in_ch;c++){
 
-    //calculate mean
-    float sum = 0;
-    for(int i = 0;i<in_h;i++){
-      for(int j=0;j<in_w;j++){
-	int32_t idx = c * in_h * in_w + i*in_w+j;
-	sum+=X->data[idx];
-      }
-    }
-    float saved_mean = sum / (in_h*in_w);
+    /* //calculate mean */
+    /* float sum = 0; */
+    /* for(int i = 0;i<in_h;i++){ */
+    /*   for(int j=0;j<in_w;j++){ */
+    /* 	int32_t idx = c * in_h * in_w + i*in_w+j; */
+    /* 	sum+=X->data[idx]; */
+    /*   } */
+    /* } */
+    /* float saved_mean = sum / (in_h*in_w); */
 
-    //calculate var
-    sum = 0;
-    for(int i = 0;i<in_h;i++){
-      for(int j=0;j<in_w;j++){
-	int32_t idx = c * in_h * in_w + i*in_w+j;
-	sum+=(X->data[idx] - saved_mean) * (X->data[idx] - saved_mean);
-      }
-    }
-    float saved_var = sum / (in_h * in_w);
+    /* //calculate var */
+    /* sum = 0; */
+    /* for(int i = 0;i<in_h;i++){ */
+    /*   for(int j=0;j<in_w;j++){ */
+    /* 	int32_t idx = c * in_h * in_w + i*in_w+j; */
+    /* 	sum+=(X->data[idx] - saved_mean) * (X->data[idx] - saved_mean); */
+    /*   } */
+    /* } */
+    /* float saved_var = sum / (in_h * in_w); */
     
     
-    float output_mean = mean->data[c] * momentum + saved_mean * (1 - momentum);
-    float output_var = var->data[c] * momentum + saved_var * (1 - momentum);
+    /* float output_mean = mean->data[c] * momentum + saved_mean * (1 - momentum); */
+    /* float output_var = var->data[c] * momentum + saved_var * (1 - momentum); */
+    float output_mean = mean->data[c];
+    float output_var = var->data[c];
     for(int i = 0;i<in_h;i++){
       for(int j=0;j<in_w;j++){
 	int32_t idx = c * in_h * in_w + i*in_w+j;
@@ -112,11 +150,13 @@ void BatchNormalization_F32(float_tensor *X, float_tensor *scale, float_tensor *
 void Gemm_F32(float_tensor *A, float_tensor *B, float_tensor *C, float_tensor *output,gemm_attrs *attrs, bool use_C){
   int32_t p = A->shape[0];
   int32_t q = A->shape[1];
-  int32_t r = B->shape[1];
+  int32_t r = output->shape[1];
+  float alpha = attrs->alpha;
+  float beta = attrs->beta;
   bool transA = attrs->transA;
   bool transB = attrs->transB;
   
-  ASSERT(!transA && !transB, "Gemm not supports transpose");
+  ASSERT(!transA, "Gemm not supports transposeA");
   ASSERT(A->ndim == 2 && B->ndim == 2, "Gemm supports only 2 dimensions");
   for(int i = 0;i<p;i++){
     for(int j = 0;j<r;j++){
@@ -126,7 +166,13 @@ void Gemm_F32(float_tensor *A, float_tensor *B, float_tensor *C, float_tensor *o
   for(int i=0;i<p;i++){
     for(int j=0;j<r;j++){
       for(int k=0;k<q;k++){
-	output->data[i * r + j] += A->data[i * q + k] * B->data[k * r + j];
+	float b_data;
+	if(transB){
+	  b_data = B->data[j * q + k];
+	}else{
+	  b_data = B->data[k * r + j];
+	}
+	output->data[i * r + j] += A->data[i * q + k] * b_data * alpha;
       }
     }
   }
@@ -134,7 +180,7 @@ void Gemm_F32(float_tensor *A, float_tensor *B, float_tensor *C, float_tensor *o
   if(use_C){
     for(int i=0;i<p;i++){
       for(int j=0;j<r;j++){
-	output->data[i * r + j]+=C->data[i * r + j];
+	output->data[i * r + j]+=C->data[i * r + j] * beta;
       }
     }
   }

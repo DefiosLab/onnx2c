@@ -6,5 +6,8 @@ layer_dict = {
     "MaxPool": MaxPool,
     "Reshape": Reshape,
     "Gemm": Gemm,
-    "BatchNormalization":BatchNormalization
+    "BatchNormalization": BatchNormalization,
+    "Add": Add,
+    "GlobalAveragePool": GlobalAveragePool,
+    "Flatten": Flatten,
 }

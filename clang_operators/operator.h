@@ -17,6 +17,8 @@ typedef struct{
   int32_t stride[10];
 } pool_attrs;
 typedef struct{
+  float alpha;
+  float beta;
   bool transA;
   bool transB;
 } gemm_attrs;
@@ -25,5 +27,6 @@ void Conv_F32(float_tensor *input, float_tensor *weight, float_tensor *bias, flo
 void MaxPool_F32(float_tensor *input, float_tensor *output, pool_attrs *attrs);
 void Gemm_F32(float_tensor *A, float_tensor *B, float_tensor *C,float_tensor *output, gemm_attrs *attrs, bool use_C);
 void BatchNormalization_F32(float_tensor *X, float_tensor *scale, float_tensor *B, float_tensor *mean, float_tensor *var, bn_attrs *attrs, float_tensor *Y);
-
+void Add_F32(float_tensor *A, float_tensor *B, float_tensor *C);
+void GlobalAveragePool_F32(float_tensor *input, float_tensor *output);
 #endif
