@@ -1,4 +1,4 @@
-# Mnist推論モデルのサンプル
+# Resnet18推論モデルのサンプル
 
 モデルは[こちら](https://github.com/onnx/models/tree/main/validated/vision/classification/mnist)の[Resnet18-V1](https://github.com/onnx/models/blob/main/validated/vision/classification/resnet/model/resnet18-v1-7.onnx)です。
 
