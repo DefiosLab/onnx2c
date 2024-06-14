@@ -5,9 +5,9 @@ setup(
     version="0.1.0",
     packages=find_packages(),
     entry_points={
-        'console_scripts': [
-            'onnx2c=onnx2c.onnx2c:main',
+        "console_scripts": [
+            "onnx2c=onnx2c.onnx2c:main",
         ],
     },
-    install_requires=["numpy", "onnxruntime", "scipy", "onnx"],
+    install_requires=["numpy", "onnxruntime", "scipy", "onnx", "onnx-simplifier"],
 )
