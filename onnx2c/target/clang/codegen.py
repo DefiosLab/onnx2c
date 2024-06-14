@@ -2,14 +2,15 @@ import numpy as np
 from onnx2c.helper import elem_type2numpy
 import os
 
+
 class Codegen:
     def __init__(self, model, tensor_data):
         self.model = model
         self.tensor_data = tensor_data
         self.artifacts_dir = "artifacts"
         os.makedirs(self.artifacts_dir, exist_ok=True)
-        self.header = open(os.path.join(self.artifacts_dir,"tensor.h"),"w")
-        self.source = open(os.path.join(self.artifacts_dir,"inference.c"),"w")
+        self.header = open(os.path.join(self.artifacts_dir, "tensor.h"), "w")
+        self.source = open(os.path.join(self.artifacts_dir, "inference.c"), "w")
         self.initializer_names = [
             initializer.name for initializer in self.model.graph.initializer
         ]
@@ -21,7 +22,6 @@ class Codegen:
             for input in model.graph.input
             if input.name not in self.initializer_names
         ]
-
 
         runner_code = "void inference("
         for input in model.graph.input:
@@ -39,7 +39,7 @@ class Codegen:
             runner_code += f"{output_type}_tensor *{output_name},"
         runner_code = runner_code[:-1] + ")"
 
-        inference_header = open(os.path.join(self.artifacts_dir,"inference.h"),"w")        
+        inference_header = open(os.path.join(self.artifacts_dir, "inference.h"), "w")
         inference_header.write(
             f"""#ifndef INFERENCE_H
 #define INFERENCE_H
@@ -55,7 +55,6 @@ class Codegen:
         self.write_source(runner_code)
 
         self.write_header("#include<stdint.h>\n")
-
 
     def check_input(self, name):
         return name in self.input_names

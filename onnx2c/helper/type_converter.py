@@ -1,4 +1,6 @@
 import numpy as np
+
+
 def elem_type2numpy(dtype_onnx):
     if dtype_onnx == 1:
         dtype_numpy = np.float32

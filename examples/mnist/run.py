@@ -33,8 +33,6 @@ ed = time.time()
 ort_time = ed - st
 
 
-
-
 lib = ctypes.CDLL("./mnist.so")
 c_func = lib.run
 c_func.argtypes = [ctypes.POINTER(ctypes.c_float), ctypes.POINTER(ctypes.c_float)]

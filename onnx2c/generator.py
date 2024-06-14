@@ -5,13 +5,14 @@ import numpy as np
 from onnx2c.target.clang.layer_dict import layer_dict
 from onnx2c.target.clang import Codegen
 
+
 class Generator:
     def __init__(self, model):
-        self.model = model        
+        self.model = model
         for opset in model.opset_import:
             if opset.version != 13:
                 raise AssertionError(f"The model's opset must be 13.")
-            
+
         self.tensor_data = {}
         self.layers = []
         self.time_dict = {}
@@ -25,25 +26,23 @@ class Generator:
         )
         self.create_layer()
         self.run()
-        
+
     def create_layer(self):
         self.layers = []
         self.gen = Codegen(self.model, self.tensor_data)
-        self.gen.generate_initializer() #initializerデータの生成
-        
-        for name in [input.name for input in self.model.graph.input]: #入力ダミーデータを追加
+        self.gen.generate_initializer()  # initializerデータの生成
+
+        for name in [input.name for input in self.model.graph.input]:  # 入力ダミーデータを追加
             if name not in self.tensor_data.keys():
                 shape, dtype = self.search_tensorinfo(name)
                 self.tensor_data[name] = np.zeros(shape).astype(dtype)
-                
+
         for node in self.model.graph.node:
             for output_name in node.output:
                 shape, dtype = self.search_tensorinfo(output_name)
                 self.tensor_data[output_name] = np.zeros(shape).astype(dtype)
             self.layers.append(
-                layer_dict[node.op_type](
-                    self.model, node, self.tensor_data, self.gen
-                )
+                layer_dict[node.op_type](self.model, node, self.tensor_data, self.gen)
             )
 
     def search_tensorinfo(self, name):
@@ -79,4 +78,4 @@ class Generator:
         for layer in self.layers:
             layer.run()
         self.gen.write_source("}\n")
-        self.gen.close()        
+        self.gen.close()

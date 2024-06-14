@@ -28,4 +28,3 @@ class Relu(Layer):
 
         op_func = f"Relu_F32({input0_mdf}{self.input_name[0]},{output_mdf}{self.output_name});\n"
         self.gen.write_source(op_func)
-

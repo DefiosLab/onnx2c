@@ -23,4 +23,3 @@ class Reshape(Layer):
                 output_code += f"{self.output_name}->shape[{i}] = {shape[i]};\n"
             output_code += f"memcpy({self.output_name}->data,{self.input_name[0]}.data,{size}*sizeof(float));\n"
             self.gen.write_source(output_code)
-
