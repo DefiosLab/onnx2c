@@ -3,3 +3,7 @@ from .conv import Conv
 from .max_pool import MaxPool
 from .reshape import Reshape
 from .gemm import Gemm
+from .batch_normalization import BatchNormalization
+from .add import Add
+from .global_average_pool import GlobalAveragePool
+from .flatten import Flatten
