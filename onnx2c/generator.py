@@ -35,6 +35,7 @@ class Generator:
         for name in [input.name for input in self.model.graph.input]:  # 入力ダミーデータを追加
             if name not in self.tensor_data.keys():
                 shape, dtype = self.search_tensorinfo(name)
+                print(name, shape, dtype)
                 self.tensor_data[name] = np.zeros(shape).astype(dtype)
 
         for node in self.model.graph.node:

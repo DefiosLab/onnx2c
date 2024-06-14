@@ -58,7 +58,14 @@ class Codegen:
 
     def check_input(self, name):
         return name in self.input_names
-
+    def generate_input_arg(self,name):
+        if self.gen.check_input(name):
+            return name
+        else:
+            return "&"+name
+        
+    
+    
     def close(self):
         self.source.close()
         self.header.close()

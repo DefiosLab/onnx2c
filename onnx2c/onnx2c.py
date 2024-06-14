@@ -5,7 +5,8 @@ import onnx
 from onnxsim import simplify
 from onnx import version_converter
 from onnx import shape_inference
-
+import onnxruntime as ort
+from onnxoptimizer import optimize
 
 def arg_parser():
     parser = argparse.ArgumentParser()
@@ -19,7 +20,6 @@ def arg_parser():
 
     args = parser.parse_args()
     return args
-
 
 def version_convert(model):
     target_opset_version = 13
@@ -46,10 +46,11 @@ def main():
     model = onnx.load(args.onnx)
     model = set_undefined_dims(model)
     model = shape_inference.infer_shapes(model)
-    model, check = simplify(model)
     if model.opset_import[0].version != 13:
         print("Convert onnx to opset=13")
         model = version_convert(model)
+    model, check = simplify(model)
+    onnx.save(model,"legalized.onnx")
     # Generate C
     gen = onnx2c.Generator(model)
 

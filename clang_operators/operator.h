@@ -3,6 +3,10 @@
 #include "types.h"
 #include <stdbool.h>
 typedef struct{
+  float epsilon;
+  float momentum;
+} bn_attrs;
+typedef struct{
   int32_t pads[10];
   int32_t stride[10];
   
