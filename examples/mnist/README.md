@@ -1,6 +1,6 @@
 # Mnist推論モデルのサンプル
 
-モデルは(こちら)[https://github.com/onnx/models/tree/main/validated/vision/classification/mnist]のmnist-12をop13に変更してonnx-simplifierに通したもの
+モデルは[こちら](https://github.com/onnx/models/tree/main/validated/vision/classification/mnist)のmnist-12をop13に変更してonnx-simplifierに通したもの
 
 
 ## C言語生成&実行
