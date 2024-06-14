@@ -10,6 +10,7 @@ import ctypes
 import urllib
 import json
 
+
 def download_imagenet_labels(filename="imagenet_labels.json"):
     url = "https://raw.githubusercontent.com/anishathalye/imagenet-simple-labels/master/imagenet-simple-labels.json"
     if os.path.exists(filename):
@@ -30,11 +31,11 @@ model_path = "resnet18-v1-7.onnx"
 model = onnx.load(model_path)
 print("Done")
 img = cv2.imread("cat.jpg")
-img = img.transpose(2,0,1)
-mean = np.array([123.675, 116.28, 103.53]).reshape(1,3,1,1)
-std = np.array([58.395, 57.12, 57.375]).reshape(1,3,1,1)
-img = (img - mean)/std
-img =  np.ascontiguousarray(img.astype(np.float32))
+img = img.transpose(2, 0, 1)
+mean = np.array([123.675, 116.28, 103.53]).reshape(1, 3, 1, 1)
+std = np.array([58.395, 57.12, 57.375]).reshape(1, 3, 1, 1)
+img = (img - mean) / std
+img = np.ascontiguousarray(img.astype(np.float32))
 
 out = np.zeros((1, 1000)).astype(np.float32)
 
