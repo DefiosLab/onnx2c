@@ -10,7 +10,7 @@ class Generator:
     def __init__(self, model):
         self.model = model
         for opset in model.opset_import:
-            if opset.version != 13:
+            if opset.version != 13 and opset.domain == "":
                 raise AssertionError(f"The model's opset must be 13.")
 
         self.tensor_data = {}
