@@ -7,6 +7,7 @@ from onnx import version_converter
 from onnx import shape_inference
 import onnxruntime as ort
 from onnxoptimizer import optimize
+import numpy as np
 
 
 def name_legalize(model):
@@ -37,6 +38,7 @@ def arg_parser():
     parser.add_argument(
         "--input_data",
         type=str,
+        default=None,
         help="Include the input data in the header.Please specify an npy file.",
     )
 
@@ -78,6 +80,9 @@ def main():
     onnx.save(model, "legalized.onnx")
     # Generate C
     gen = onnx2c.Generator(model)
+    if args.input_data is not None:
+        input_tensor = np.load(args.input_data)
+        gen.generate_input(input_tensor)
 
 
 if __name__ == "__main__":

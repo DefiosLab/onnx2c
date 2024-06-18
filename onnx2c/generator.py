@@ -79,3 +79,6 @@ class Generator:
             layer.run()
         self.gen.write_source("}\n")
         self.gen.close()
+
+    def generate_input(self, input_tensor):
+        self.gen.write_input(input_tensor)

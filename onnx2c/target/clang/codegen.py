@@ -77,7 +77,7 @@ class Codegen:
         elif dtype == np.int32:
             return "int32_t"
         else:
-            raise ("Unsupports numpy type")
+            assert "Unsupports numpy type"
 
     def array2text(self, array, length):
         text = "{"
@@ -108,3 +108,22 @@ class Codegen:
 
     def write_header(self, text):
         self.header.write(text)
+
+    def write_input(self, input_tensor):
+        assert input_tensor.dtype == np.float32, "only support input dtype float32"
+        input_header = open(os.path.join(self.artifacts_dir, "input.h"), "w")
+        size = np.prod(np.array(input_tensor.shape))
+        text = f"""
+#ifndef INPUT_H
+#define INPUT_H
+#include "types.h"
+static float input_data[{size}] = 
+"""
+        text += self.array2text(input_tensor.reshape(-1), size) + ";\n"
+        ndim = input_tensor.ndim
+        shape = self.array2text(input_tensor.shape, ndim)
+        text += f"""
+float_tensor input = {{ {ndim},{shape},input_data }};
+#endif
+"""
+        input_header.write(text)
